@@ -1,9 +1,9 @@
 /*
  ============================================================================
  Name        : sjfp.c
- Author      : Muneeb Shaikh
+ Author      : Muneeb Shaikh, Parikshit Ghodake
  Version     : 0.1
- Copyright   : None
+ Copyright   : GPL v3
  Description : Shortest Job First Pre-emptive Algorithm
  ============================================================================
  */
@@ -20,9 +20,9 @@ typedef struct {
 }proc;
 
 void psort(proc *, int);
-int selectProcess(proc *);
-void execProcess(proc *);
-
+int selectProcess(proc *);			/* Selects process having shortest burst time */
+int execProcess(proc *, int);		/* Executes process got from selectProcess */
+int getTotalBurstTime(proc *, int); /* Calculates total burst Time */
 
 int main(void) {
 	proc process[10];
@@ -54,7 +54,9 @@ int main(void) {
 		printf("\n%s\t%d\t%d", process[i].name, process[i].arrvialTime, process[i].burstTime);
 	}
 
-	execProcess(process);
+	printf("%d", getTotalBurstTime(process, numOfProcesses) );
+
+	execProcess(process, getTotalBurstTime(process, numOfProcesses ));
 
 	printf("All Processes executed...");
 
@@ -84,12 +86,32 @@ int selectProcess(proc pproc[]) {
 	int i=0, indexOfleastProcessTime;
 	indexOfleastProcessTime = -1;
 
+	if(currentTime == 0) {
+		return 0;
+	} else {
+		for(i=0; i < currentTime; i++) {
+			if(pproc[i].arrvialTime <= currentTime) {
+				if(pproc[i+1].arrvialTime <= currentTime) {
+					if(pproc[i].burstTime <= pproc[i+1].burstTime) {
+						return i;
+					} else {
+						return i+1;
+					}
+				} else {
+					return i;
+				}
+			}
+		}
+	}
+
+/*
 	while( (pproc[i].arrvialTime <= currentTime) || (pproc[i].arrvialTime <= currentTime && pproc[i+1].arrvialTime <= currentTime)) {
 		if( ((pproc[i].burstTime) < (pproc[i+1].burstTime)) && (pproc[i].burstTime!=0) ) {
 			indexOfleastProcessTime = i;
 			i++;
 		}
 	}
+		*/
 /*	for(i=0; i<=currentTime; i++) {
 		if( ((pproc[i].burstTime) < (pproc[i+1].burstTime)) && (pproc[i].burstTime!=0) ) {
 			indexOfleastProcessTime = i;
@@ -103,21 +125,35 @@ int selectProcess(proc pproc[]) {
 
 }
 
-void execProcess(proc pproc[]) {
+int execProcess(proc pproc[], int totalBurstTime) {
 	int indexOfleastProcessTime;
-	printf("Fetching next Shortest Process...\n");
+	printf("\n\nFetching next Shortest Process...\n");
 
-	indexOfleastProcessTime = selectProcess(pproc);
-	if(indexOfleastProcessTime == -1)
-		return;
+	if(currentTime == totalBurstTime) /*Terminating Condition*/
+		return 0;
+	else {
 
-	printf("Executing Process %s \n", pproc[indexOfleastProcessTime].name);
-	pproc[indexOfleastProcessTime].burstTime -= 1;
-	system("sleep 1");
-	currentTime += 1;
+		indexOfleastProcessTime = selectProcess(pproc);
+		/*if(indexOfleastProcessTime == -1)
+		return;*/
+
+		printf("\nExecuting Process %s \n", pproc[indexOfleastProcessTime].name);
+		pproc[indexOfleastProcessTime].burstTime -= 1;
+		system("sleep 1");
+		currentTime += 1;
+	}
+
+	execProcess(pproc, totalBurstTime);
+	return 0;
 }
 
-
+int getTotalBurstTime(proc pproc[], int numOfProcesses) {
+	int i, sum = 0;
+	for(i=0; i< numOfProcesses; i++) {
+		sum += pproc[i].burstTime;
+	}
+	return sum;
+}
 
 
 

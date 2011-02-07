@@ -18,6 +18,12 @@ typedef struct {
 	char name[3];
 	int arrvialTime;
 	int burstTime;
+	int startTime;
+	int finishTime;
+	int waitngTime;
+	int turnaroundTime;
+	int IsActive;
+	int IsArrived;
 }proc;
 
 void psort(proc *, int);			/* Sorts Processes according to Burst Time */
@@ -40,6 +46,7 @@ int main(void) {
 		scanf("%d", &process[i].arrvialTime);
 		printf("Enter Burst Time for Process P%d: ", i+1);
 		scanf("%d", &process[i].burstTime);
+		process[i].startTime = 0;
 	}
 
 	printf("PName\tArrTime\tBTime\n");
@@ -49,15 +56,20 @@ int main(void) {
 	}
 
 	psort(process, numOfProcesses);
-	puts("After Sorting \n");
+//	puts("After Sorting \n");
+
+	execProcess(process, getTotalBurstTime(process, numOfProcesses ));
+
+	printf("PName\tArrTime\tBTime\tSTime\tFTime\tWTime\tTATime\n");
 
 	for(i=0; i<numOfProcesses; i++) {
-		printf("\n%s\t%d\t%d", process[i].name, process[i].arrvialTime, process[i].burstTime);
+		printf("\n%s\t%d\t%d\t%d\t%d", process[i].name, process[i].arrvialTime, process[i].burstTime,
+				process[i].startTime, process[i].finishTime);
 	}
 
 	printf("\nTotal Burst Time: %d \n", getTotalBurstTime(process, numOfProcesses) );
 
-	execProcess(process, getTotalBurstTime(process, numOfProcesses ));
+//	execProcess(process, getTotalBurstTime(process, numOfProcesses ));
 
 	printf("All Processes executed...");
 
@@ -102,6 +114,13 @@ int selectProcess(proc pproc[]) {
 		}
 		j++;
 	}
+
+	if(indexOfleastProcessTime == 0 && pproc[indexOfleastProcessTime].startTime == 0) {
+		pproc[indexOfleastProcessTime].startTime = 0;
+	} else if(pproc[indexOfleastProcessTime].startTime == 0) {
+		pproc[indexOfleastProcessTime].startTime = currentTime-1;
+	}
+
 	return indexOfleastProcessTime;
 }
 
@@ -117,12 +136,16 @@ void execProcess(proc pproc[], int totalBurstTime) {
 
 		printf("\nExecuting Process %s \n", pproc[indexOfleastProcessTime].name);
 		pproc[indexOfleastProcessTime].burstTime -= 1;
+
+
+		if(pproc[indexOfleastProcessTime].burstTime == 0)
+			pproc[indexOfleastProcessTime].finishTime = currentTime;
+
 		system("sleep 1");
 		currentTime += 1;
 	}
 
 }
-
 
 
 int getTotalBurstTime(proc pproc[], int numOfProcesses) {

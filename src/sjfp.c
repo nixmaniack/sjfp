@@ -11,6 +11,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define TRUE 1
+#define FALSE 0
+
 static int currentTime=1;
 int numOfProcesses;
 
@@ -46,7 +49,12 @@ int main(void) {
 		scanf("%d", &process[i].arrvialTime);
 		printf("Enter Burst Time for Process P%d: ", i+1);
 		scanf("%d", &process[i].burstTime);
+
+		// Initialise other properties accordingly
 		process[i].startTime = 0;
+		process[i].waitngTime = 0;
+		process[i].IsActive = process[i].IsArrived = FALSE;
+
 	}
 
 	printf("PName\tArrTime\tBTime\n");

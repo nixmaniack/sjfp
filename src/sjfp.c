@@ -113,9 +113,10 @@ int selectProcess(proc pproc[]) {
 	for(j=0; j <= i && pproc[j].burstTime == 0; j++); /* Find first non-zero value in array*/
 
 	minBurstTime = pproc[j].burstTime;
+	indexOfleastProcessTime = j;
 
 	while(j<=i) {
-		if(pproc[j].burstTime != 0 && pproc[j].burstTime <= minBurstTime) {
+		if(pproc[j].burstTime != 0 && pproc[j].burstTime < minBurstTime) {
 			minBurstTime = pproc[j].burstTime;
 			indexOfleastProcessTime = j;
 		}
